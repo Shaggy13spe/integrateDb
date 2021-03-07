@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\integrateDb\integrateDb.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="my-test.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="my-test.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+</Project>
