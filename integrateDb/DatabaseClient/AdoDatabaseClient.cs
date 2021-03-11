@@ -5,6 +5,7 @@ using System.Text.Json;
 
 using integrateDb.Interfaces;
 using integrateDb.Managers;
+using integrateDb.Models;
 
 namespace integrateDb.DatabaseClient {
     public abstract class AdoDatabaseClient<TDbConnection, TDbCommand> : IDatabaseClient
@@ -25,8 +26,8 @@ namespace integrateDb.DatabaseClient {
             ExecuteCommand(command, ConnectionString);
         }
 
-        public abstract void InsertTableData(JsonElement dataset);
-        public abstract JsonElement ReadTableData(string command, FormatterManager formatter);
+        public abstract void InsertTableData(Dataset dataset);
+        public abstract Dataset ReadTableData(string command, FormatterManager formatter);
 
         protected void ExecuteCommand(string command, string connectionString) {
             var connection = GetDbConnection(connectionString);

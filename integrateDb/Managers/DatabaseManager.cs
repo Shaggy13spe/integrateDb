@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Threading;
 
 using integrateDb.Interfaces;
+using integrateDb.Models;
 
 namespace integrateDb.Managers {
     public abstract class DatabaseManager<TDatabaseClient> : IDatabaseManager
@@ -23,12 +24,11 @@ namespace integrateDb.Managers {
             Config = config;
         }
 
-
         public IDatabaseManager ExecuteSqlScripts(params string[] scriptNames) {
             ValidateDependencies();
-
-            foreach(var scriptName in scriptNames) {
-                var script = FindScript(scriptName);
+            foreach(var script in from scriptName in scriptNames
+                                  let script = FindScript(scriptName)
+                                  select script) {
                 DatabaseClient.ExecuteCommand(script.GetProperty("value").GetString());
             }
 
@@ -41,9 +41,9 @@ namespace integrateDb.Managers {
 
         public IDatabaseManager LoadTables(params string[] datasetNames) {
             ValidateDependencies();
-
-            foreach(var datesetName in datasetNames) {
-                var dataset = FindDataset(datesetName);
+            foreach(var dataset in from datesetName in datasetNames
+                                   let dataset = FindDataset(datesetName)
+                                   select dataset) {
                 DatabaseClient.InsertTableData(dataset);
             }
 
@@ -61,7 +61,7 @@ namespace integrateDb.Managers {
             var actualDataScript = FindScript(actualScriptName).GetProperty("value").ToString();
             var actualData = DatabaseClient.ReadTableData(actualDataScript, formatterManager);
 
-            string[] keys = new string[] { key };
+            var keys = new string[] { key };
             if(otherKeys != null)
                 keys = keys.Union(otherKeys).ToArray();
 
@@ -69,19 +69,23 @@ namespace integrateDb.Managers {
         }
 
         public IDatabaseManager RegisterFormatter(Type type, Func<object, string> func) {
-            throw new NotImplementedException();
+            formatterManager.Register(type, func);
+            return this;
         }
 
         public IDatabaseManager RegisterFormatter(Type type, IColumnFormatter formatter) {
-            throw new NotImplementedException();
+            formatterManager.Register(type, formatter);
+            return this;
         }
 
-        public IDatabaseManager RegisterFormatter(string column, Func<object, string> func) {
-            throw new NotImplementedException();
+        public IDatabaseManager RegisterFormatter(string columnName, Func<object, string> func) {
+            formatterManager.Register(columnName, func);
+            return this;
         }
 
-        public IDatabaseManager RegisterFormatter(string column, IColumnFormatter formatter) {
-            throw new NotImplementedException();
+        public IDatabaseManager RegisterFormatter(string columnName, IColumnFormatter formatter) {
+            formatterManager.Register(columnName, formatter);
+            return this;
         }
 
         protected void BeginTest() {
@@ -108,30 +112,28 @@ namespace integrateDb.Managers {
         }
 
         private JsonElement FindScript(string scriptName) {
-            foreach(var input in inputs) {
-                var jsonDoc = input.Value;
-                var root = jsonDoc.RootElement;
-                var scripts = root.GetProperty("scripts");
-
-                foreach(var script in scripts.EnumerateArray()) {
-                    if(script.GetProperty("name").GetString() == scriptName)
-                        return script;
-                }
+            foreach(var script in from input in inputs
+                                  let jsonDoc = input.Value
+                                  let root = jsonDoc.RootElement
+                                  let scripts = root.GetProperty("scripts")
+                                  from script in scripts.EnumerateArray()
+                                  where script.GetProperty("name").GetString() == scriptName
+                                  select script) {
+                return script;
             }
 
             throw new InvalidOperationException($"Script '{scriptName}' not found");
         }
 
-        private JsonElement FindDataset(string datasetName) {
-            foreach(var input in inputs) {
-                var jsonDoc = input.Value;
-                var root = jsonDoc.RootElement;
-                var datasets = root.GetProperty("datasets");
-
-                foreach(var dataset in datasets.EnumerateArray()) {
-                    if(dataset.GetProperty("name").GetString() == datasetName)
-                        return dataset;
-                }
+        private Dataset FindDataset(string datasetName) {
+            foreach(var dataset in from input in inputs
+                                   let jsonDoc = input.Value
+                                   let root = jsonDoc.RootElement
+                                   let datasets = root.GetProperty("datasets")
+                                   from dataset in datasets.EnumerateArray()
+                                   where dataset.GetProperty("name").GetString() == datasetName
+                                   select dataset) {
+                return Dataset.Parse(dataset);
             }
 
             throw new InvalidOperationException($"Dataset '{datasetName} not found");

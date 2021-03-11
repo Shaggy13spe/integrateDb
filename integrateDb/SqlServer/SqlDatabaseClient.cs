@@ -8,6 +8,7 @@ using System.Text.Json;
 
 using integrateDb.DatabaseClient;
 using integrateDb.Managers;
+using integrateDb.Models;
 
 using Microsoft.Data.SqlClient;
 
@@ -16,85 +17,61 @@ namespace integrateDb.SqlServer {
 
         public SqlDatabaseClient(bool reuseConnection) : base(reuseConnection) { }
 
-        public override JsonElement ReadTableData(string command, FormatterManager formatter) {
-            using var memoryStream = new MemoryStream();
-            using var writer = new Utf8JsonWriter(memoryStream, new JsonWriterOptions { Indented = true });
+        public override Dataset ReadTableData(string command, FormatterManager formatter) {
 
             using var connection = CreateDbConnection(ConnectionString);
             connection.Open();
             using var sqlCommand = CreateDbCommand(command, connection);
             using var reader = sqlCommand.ExecuteReader(CommandBehavior.KeyInfo);
-            var tableSchema = reader.GetSchemaTable();
+            var tableName = reader.GetSchemaTable().Rows[0]["BaseTableName"].ToString();
 
-            writer.WriteStartObject();
-            writer.WritePropertyName("table");
-            writer.WriteStringValue(tableSchema.Rows[0]["BaseTableName"].ToString());
-
-            writer.WriteStartArray("rows");
+            var dataset = new Dataset();
+            var rows = new List<Row>();
             while(reader.Read()) {
-                writer.WriteStartObject();
-                writer.WriteStartArray("columns");
+                var columns = new List<Column>();
 
                 for(var i = 0; i < reader.VisibleFieldCount; i++) {
-                    var columnName = reader.GetName(i);
-                    var value = formatter.Format(tableSchema.TableName, columnName, reader[i]);
-
-                    writer.WriteStartObject();
-                    writer.WritePropertyName("name");
-                    writer.WriteStringValue(columnName);
-                    writer.WritePropertyName("value");
-                    writer.WriteStringValue(value);
-                    writer.WriteEndObject();
+                    var column = new Column(reader.GetName(i), formatter.Format(tableName ?? "", reader.GetName(i), reader[i]));
+                    columns.Add(column);
                 }
 
-                writer.WriteEndArray();
-                writer.WriteEndObject();
+                var row = new Row { Columns = columns };
+                rows.Add(row);
             }
 
-            writer.WriteEndArray();
-            writer.WriteEndObject();
-
-            writer.Flush();
-
-            var jsonString = Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length);
-
-            var document = JsonDocument.Parse(jsonString);
-            return document.RootElement;
-
+            dataset.Rows = rows;
+            return dataset;
         }
 
-        public override void InsertTableData(JsonElement dataset) {
+        public override void InsertTableData(Dataset dataset) {
 
             var stringBuilder = new StringBuilder();
-            var tableName = dataset.GetProperty("table").GetString();
+            var tableName = dataset.Table;
 
-            var setIdentityInsertExists = dataset.TryGetProperty("setIdentityInsert", out JsonElement setIdentityInsert);
-            if(setIdentityInsertExists && setIdentityInsert.GetBoolean()) {
+            if(dataset.SetIdentityInsert) {
                 var setIdentitySql = $"SET IDENTITY_INSERT {tableName} ON;";
                 stringBuilder.AppendLine(setIdentitySql);
                 stringBuilder.AppendLine();
             }
 
-            foreach(var row in dataset.GetProperty("rows").EnumerateArray()) {
-                var queryFieldNames = string.Join(", ",
-                    row.GetProperty("columns").EnumerateArray().Select(a =>
-                        a.GetProperty("name").GetString()).ToArray());
-
-                var queryFieldValues = string.Join(", ",
-                    row.GetProperty("columns").EnumerateArray().Select(a => {
-                        var value = a.GetProperty("value").GetString();
-                        var converterTypeExists = a.TryGetProperty("converterType", out JsonElement converterType);
-                        if(converterTypeExists)
-                            return $"CONVERT({converterType.GetString()}, '{value}', 1)";
-                        else
-                            return $"'{value}'";
-                    }).ToArray());
-
-                var insertSql = $"INSERT INTO {tableName} ({queryFieldNames}) VALUES ({queryFieldValues});";
+            foreach(var insertSql in from row in dataset.Rows
+                                     let queryFieldNames = string.Join(", ",
+                                        row.Columns.Select(a =>
+                                            a.Name).ToArray())
+                                     let queryFieldValues = string.Join(", ",
+                                        row.Columns.Select(a => {
+                                            var value = a.Value;
+                                            if(a.ConverterType != null)
+                                                return $"CONVERT({a.ConverterType}, '{value}', 1)";
+                                            else
+                                                return $"'{value}'";
+                                        }).ToArray())
+                                     let insertSql = $"INSERT INTO {tableName} ({queryFieldNames}) VALUES ({queryFieldValues});"
+                                     select insertSql) {
                 stringBuilder.AppendLine(insertSql);
             }
 
-            if(setIdentityInsertExists && setIdentityInsert.GetBoolean()) {
+            if(dataset.SetIdentityInsert) {
                 var setIdentitySql = $"SET IDENTITY_INSERT {tableName} OFF;";
                 stringBuilder.AppendLine(setIdentitySql);
                 stringBuilder.AppendLine();
@@ -104,7 +81,7 @@ namespace integrateDb.SqlServer {
 
         }
 
-        protected override SqlConnection CreateDbConnection(string connectionString) => new SqlConnection(connectionString);
-        protected override SqlCommand CreateDbCommand(string command, SqlConnection connection) => new SqlCommand(command, connection);
+        protected override SqlConnection CreateDbConnection(string connectionString) => new(connectionString);
+        protected override SqlCommand CreateDbCommand(string command, SqlConnection connection) => new(command, connection);
     }
 }

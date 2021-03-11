@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.808.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "integrateDb", "integrateDb\integrateDb.csproj", "{D3F1D101-3201-4E63-973A-9842982E8C21}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "integrateDbConsole", "integrateDbConsole\integrateDbConsole.csproj", "{7544A3FF-B2ED-47F2-A865-F9878D4F5A06}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "integrateDbTests", "integrateDbTests\integrateDbTests.csproj", "{6BF82D2A-BF0A-4FB3-99CC-7136BA86BFF7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{D3F1D101-3201-4E63-973A-9842982E8C21}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3F1D101-3201-4E63-973A-9842982E8C21}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3F1D101-3201-4E63-973A-9842982E8C21}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7544A3FF-B2ED-47F2-A865-F9878D4F5A06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7544A3FF-B2ED-47F2-A865-F9878D4F5A06}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7544A3FF-B2ED-47F2-A865-F9878D4F5A06}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7544A3FF-B2ED-47F2-A865-F9878D4F5A06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BF82D2A-BF0A-4FB3-99CC-7136BA86BFF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BF82D2A-BF0A-4FB3-99CC-7136BA86BFF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BF82D2A-BF0A-4FB3-99CC-7136BA86BFF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BF82D2A-BF0A-4FB3-99CC-7136BA86BFF7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 
 using integrateDb.Managers;
+using integrateDb.Models;
 
 namespace integrateDb.Interfaces {
 
@@ -19,13 +20,13 @@ namespace integrateDb.Interfaces {
         /// Inserts data into a table
         /// </summary>
         /// <param name="dataset">the data that is to be inserted</param>
-        void InsertTableData(JsonElement dataset);
+        void InsertTableData(Dataset dataset);
 
         /// <summary>
         /// Executes a SQL command that returns an object from the data
         /// </summary>
         /// <param name="command"></param>
         /// <param name="formatter"></param>
-        JsonElement ReadTableData(string command, FormatterManager formatter);
+        Dataset ReadTableData(string command, FormatterManager formatter);
     }
 }
