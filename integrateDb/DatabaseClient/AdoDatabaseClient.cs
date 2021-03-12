@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.Common;
-using System.Text.Json;
 
 using integrateDb.Interfaces;
 using integrateDb.Managers;

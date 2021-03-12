@@ -29,7 +29,7 @@ namespace integrateDb.Managers {
             foreach(var script in from scriptName in scriptNames
                                   let script = FindScript(scriptName)
                                   select script) {
-                DatabaseClient.ExecuteCommand(script.GetProperty("value").GetString());
+                DatabaseClient.ExecuteCommand(script.Value);
             }
 
             return this;
@@ -58,7 +58,7 @@ namespace integrateDb.Managers {
             ValidateDependencies();
 
             var expectedData = FindDataset(expectedDatasetName);
-            var actualDataScript = FindScript(actualScriptName).GetProperty("value").ToString();
+            var actualDataScript = FindScript(actualScriptName).Value;
             var actualData = DatabaseClient.ReadTableData(actualDataScript, formatterManager);
 
             var keys = new string[] { key };
@@ -111,7 +111,7 @@ namespace integrateDb.Managers {
                 throw new InvalidOperationException("Input file not specified");
         }
 
-        private JsonElement FindScript(string scriptName) {
+        private Script FindScript(string scriptName) {
             foreach(var script in from input in inputs
                                   let jsonDoc = input.Value
                                   let root = jsonDoc.RootElement
@@ -119,7 +119,7 @@ namespace integrateDb.Managers {
                                   from script in scripts.EnumerateArray()
                                   where script.GetProperty("name").GetString() == scriptName
                                   select script) {
-                return script;
+                return Script.Parse(script);
             }
 
             throw new InvalidOperationException($"Script '{scriptName}' not found");

@@ -7,7 +7,6 @@
 	<ItemGroup>
 		<Folder Include="Interfaces\" />
 		<Folder Include="Managers\" />
-		<Folder Include="SqlServer\" />
 		<Folder Include="DatabaseClient\" />
 		<Folder Include="Formatter\" />
 		<Folder Include="Models\" />
