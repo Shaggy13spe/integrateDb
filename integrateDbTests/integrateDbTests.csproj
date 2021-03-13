@@ -23,6 +23,7 @@
   <ItemGroup>
     <Folder Include="Formatters\" />
     <Folder Include="Managers\" />
+    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\integrateDb\integrateDb.csproj" />

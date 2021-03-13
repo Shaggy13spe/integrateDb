@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Text.Json;
 
 namespace integrateDb.Models {
     public class Script {
@@ -6,15 +7,18 @@ namespace integrateDb.Models {
         public string Value { get; private set; } = "";
 
         public static Script Parse(JsonElement scriptJson) {
-            //Validation code here
-
             var result = new Script();
-            if(scriptJson.TryGetProperty("name", out var name) && scriptJson.TryGetProperty("value", out var value)) {
-                result.Name = name.GetString()!;
+            var name = scriptJson.GetProperty("name").GetString();
+            if(scriptJson.TryGetProperty("value", out var value)) {
+                if(string.IsNullOrWhiteSpace(value.GetString()))
+                    throw new InvalidOperationException($"Script '{name}', value cannot be null or empty string");
+
+                result.Name = name!;
                 result.Value = value.GetString()!;
+                return result;
             }
 
-            return result;
+            throw new InvalidOperationException($"Script '{name}' is missing a value property");
         }
     }
 }
