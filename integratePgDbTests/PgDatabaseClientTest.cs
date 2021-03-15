@@ -5,39 +5,39 @@ using FluentAssertions;
 
 using integrateDb.Managers;
 using integrateDb.Models;
-using integrateDb.SqlServer;
+using integrateDb.PostgresSql;
 
-using Microsoft.Data.SqlClient;
+using Npgsql;
 
 using Xunit;
 
-namespace integrateSqlDbTests {
-    public class SqlDatabaseClientTest {
-        private readonly string connectionString = "Server=localhost;Database=integrateDbTest;User Id=sa;Password=#SAPassword!;";
-        private readonly string createTempTableCommand = "CREATE TABLE #TempTable (col1 INT);";
-        private readonly string verifyIfTempTableExistsQuery = "INSERT INTO #TempTable (col1) VALUES (1);";
+namespace integratePgDbTests {
+    public class PgDatabaseClientTest {
+        private readonly string connectionString = "Host=localhost;Port=5432;Database=integrateDb;Username=integrateDb;Password=integrateDb";
+        private readonly string createTempTableCommand = "CREATE TEMPORARY TABLE TempTable (col1 INT);";
+        private readonly string verifyIfTempTableExistsQuery = "INSERT INTO TempTable (col1) VALUES (1);";
 
         [Fact]
         public void Connection_Is_Not_Reused() {
-            var client = new SqlDatabaseClient(false) { ConnectionString = connectionString };
+            var client = new PgDatabaseClient(false) { ConnectionString = connectionString };
             client.ExecuteCommand(createTempTableCommand);
 
             Action action = () => client.ExecuteCommand(verifyIfTempTableExistsQuery);
-            action.Should().Throw<SqlException>();
+            action.Should().Throw<PostgresException>();
         }
 
         [Fact]
         public void Connection_Is_Reused_When_Configured() {
-            var client = new SqlDatabaseClient(true) { ConnectionString = connectionString };
+            var client = new PgDatabaseClient(true) { ConnectionString = connectionString };
             client.ExecuteCommand(createTempTableCommand);
 
             Action action = () => client.ExecuteCommand(verifyIfTempTableExistsQuery);
             action.Should().NotThrow();
         }
 
-        [Fact(Skip = "need to setup sql database")]
+        [Fact]
         public void Write_Read_And_Compare_Results() {
-            var client = new SqlDatabaseClient(false) { ConnectionString = connectionString };
+            var client = new PgDatabaseClient(false) { ConnectionString = connectionString };
             var deleteCmd = @"
                 DELETE FROM public.product;
                 DELETE FROM public.category;
