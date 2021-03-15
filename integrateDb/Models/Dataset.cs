@@ -15,11 +15,20 @@ namespace integrateDb.Models {
             var result = new Dataset();
             var datasetName = datasetJson.GetProperty("name").GetString();
 
-            if(!datasetJson.TryGetProperty("table", out _))
+            result.Name = datasetName;
+
+            if(!datasetJson.TryGetProperty("table", out var table))
                 throw new InvalidOperationException($"Dataset '{datasetName}' is missing a table property");
+
+            result.Table = table.GetString();
 
             if(!datasetJson.TryGetProperty("rows", out _))
                 throw new InvalidOperationException($"Dataset '{datasetName}' is missing a rows array");
+
+            if(datasetJson.TryGetProperty("setIdentityInsert", out var schema))
+                result.Schema = schema.GetString()!;
+
+            result.SetIdentityInsert = datasetJson.TryGetProperty("setIdentityInsert", out _);
 
             result.Rows = new();
             var rowCount = 0;

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 
 using integrateDb.Interfaces;
@@ -11,8 +12,8 @@ namespace integrateDb.DatabaseClient {
         where TDbCommand : DbCommand {
 
         private readonly bool reuseConnection = false;
-        private readonly Dictionary<string, TDbConnection> connections = new Dictionary<string, TDbConnection>();
-        private readonly object syncLock = new object();
+        private readonly Dictionary<string, TDbConnection> connections = new();
+        private readonly object syncLock = new();
 
         public string ConnectionString { get; set; }
 
@@ -30,7 +31,8 @@ namespace integrateDb.DatabaseClient {
         protected void ExecuteCommand(string command, string connectionString) {
             var connection = GetDbConnection(connectionString);
             try {
-                connection.Open();
+                if(connection.State != ConnectionState.Open)
+                    connection.Open();
                 using var dbCommand = CreateDbCommand(command, connection);
                 dbCommand.ExecuteNonQuery();
             }
