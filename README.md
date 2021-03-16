@@ -102,7 +102,7 @@ When calling `Initialize` without passing a config object, a default configurati
   >
   > `value`: the value for the column
   >
-  > 'converterType`: **OPTIONAL** - the data type to use for an explicit conversion/cast when loading data
+  > `converterType`: **OPTIONAL** - the data type to use for an explicit conversion/cast when loading data
 
   An example of an input file would be:
 
