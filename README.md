@@ -293,8 +293,9 @@ public void UpdateSupplier_GivenSupplier_ThenUpdateSupplierAndReturnTrue() {
   actual.Should().BeTrue();
   databaseManager.AssertDatasetVsScript("suppliers-updated", "select-all-suppliers", "Id");
 }
+```
 
-During initialization of the DatabaseManager, the table Suppliers was populated with the following dataset:
+During initialization of the DatabaseManager, the table `Suppliers` was populated with the following dataset:
 
 ```json
   {
