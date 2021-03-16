@@ -4,7 +4,7 @@
 Based on the [DbSafe](https://github.com/dbsafe/dbsafe) project, this library provides for the ability to make integration testing with your database a little easier, allowing for populating the database, executing commands, and comparing expected vs actual datasets.  This fork adds functionality not added to the original branch and thus the reason for changing the name of the library.
 
 ## Getting Started
-------------------
+
 ### Supported databases
 Currently the following databases are supported, with more planned on the way:
 
@@ -71,7 +71,7 @@ When calling `Initialize` without passing a config object, a default configurati
 | Property Name   | Type    | Defaults | Description                                                     |
 |-----------------|---------|:--------:|-----------------------------------------------------------------|
 | SerializeTests  | boolean | **true**     | Indicates whether the tests should be serialized |
-| ReuseConnection | boolean | **false**     | Indicates whether the database connection should be reused (`AssertScriptVsDataset` always uses a new connection) |
+| ReuseConnection | boolean | **false**     | Indicates whether the database connection should be reused |
 
   ### Input Files
 
@@ -100,9 +100,9 @@ When calling `Initialize` without passing a config object, a default configurati
 
   > `name`: the name of the column
   >
-  > `value': the value for the column
+  > `value`: the value for the column
   >
-  > 'converterType': **OPTIONAL** - the data type to use for an explicit conversion/cast when loading data
+  > 'converterType`: **OPTIONAL** - the data type to use for an explicit conversion/cast when loading data
 
   An example of an input file would be:
 
