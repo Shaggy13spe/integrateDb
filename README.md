@@ -482,7 +482,7 @@ Values read from a table are converted to a `string` to create an actual local d
 
 **money and decimal data types**
 
-The SQL Server data type `money` converts to a `string` with four decimal places. The `decimal` data type converts using the number of decimal places of the type, e.g. `101.10 is converted to `101.1000`.
+The SQL Server data type `money` converts to a `string` with four decimal places. The `decimal` data type converts using the number of decimal places of the type, e.g. `101.10` is converted to `101.1000`.
 
 **datetime(s) data type**
 
