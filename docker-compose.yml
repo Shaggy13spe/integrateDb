@@ -1,8 +1,0 @@
-version: '3.4'
-
-services:
-  integratepgdbtests:
-    image: ${DOCKER_REGISTRY-}integratepgdbtests
-    build:
-      context: .
-      dockerfile: integratePgDbTests/Dockerfile
