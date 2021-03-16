@@ -44,9 +44,10 @@ namespace integrateDb.SqlServer {
 
             var stringBuilder = new StringBuilder();
             var tableName = dataset.Table;
+            var schema = dataset.Schema;
 
             if(dataset.SetIdentityInsert) {
-                var setIdentitySql = $"SET IDENTITY_INSERT {tableName} ON;";
+                var setIdentitySql = $"SET IDENTITY_INSERT [{schema}].[{tableName}] ON;";
                 stringBuilder.AppendLine(setIdentitySql);
                 stringBuilder.AppendLine();
             }
@@ -63,13 +64,13 @@ namespace integrateDb.SqlServer {
                                             else
                                                 return $"'{value}'";
                                         }).ToArray())
-                                     let insertSql = $"INSERT INTO {tableName} ({queryFieldNames}) VALUES ({queryFieldValues});"
+                                     let insertSql = $"INSERT INTO [{schema}].[{tableName}] ({queryFieldNames}) VALUES ({queryFieldValues});"
                                      select insertSql) {
                 stringBuilder.AppendLine(insertSql);
             }
 
             if(dataset.SetIdentityInsert) {
-                var setIdentitySql = $"SET IDENTITY_INSERT {tableName} OFF;";
+                var setIdentitySql = $"SET IDENTITY_INSERT [{schema}].[{tableName}] OFF;";
                 stringBuilder.AppendLine(setIdentitySql);
                 stringBuilder.AppendLine();
             }
